@@ -1,4 +1,7 @@
+#include <iostream>
 #include "date.h"
+
+using namespace std;
 
 int Date::getDay() { return day; }
 int Date::getMonth() { return month; }

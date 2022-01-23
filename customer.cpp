@@ -1,17 +1,23 @@
 #include <fstream>
 #include <string>
 #include "customer.h"
+#include "bank.h"
 
 class cannotSendLoanReqException
 {
 };
 
-Customer::Customer(string fName, string lName, string ID, Date bDate, string uName, string pass, Bank *b)
+string generateSerialNumber(Bank *bank);
+int chooseNumberOfInstallments();
+
+Customer::Customer(string fName, string lName, string ID, string bDate, string uName, string pass, Bank *b)
     : firstName{fName}, lastName{lName}, nationalCode{ID}, birthDate{bDate}, username{uName}, password{pass}
 {
     this->bank = b;
 }
 
+string Customer::getFirstName() { return firstName; }
+string Customer::getLastName() { return lastName; }
 string Customer::getUsername() { return username; }
 string Customer::getPassword() { return password; }
 string Customer::getNationalCode() { return nationalCode; }
@@ -73,7 +79,6 @@ void Customer::loanRequest()
         fout << bank->getAllAccounts()->at(accIndex).loanAmountPotential << "-";
         fout << chooseNumberOfInstallments() << "-0-0";
 
-
         cout << "Loan request sent successfuly" << endl;
         fout.close();
     }
@@ -111,14 +116,13 @@ void Customer::showAccountsInfo()
 {
     for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
     {
-        cout << "=== Account " << i + 1 << " ==========" << endl;
+        cout << "\n=== Account " << i + 1 << " ==========" << endl;
         bank->getAllAccounts()->at(i).showAccountInfo();
         cout << "============================================" << endl;
     }
 }
 void Customer::showLoansInfo()
 {
-    
 }
 
 string generateSerialNumber(Bank *bank)

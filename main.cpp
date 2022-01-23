@@ -7,18 +7,20 @@ int selectChoice();
 int employeeLogin();
 int customerLogin();
 
-string getUsername();
-string getPassword();
+string inputUsername();
+string inputPassword();
 void showCustomerMenu();
 void selectAndDoOperationForCustomer(int, int);
-int selectAndDoOperationForCustomer(int);
+void selectAndDoOperationForEmployee(int);
+void doOperationForManager();
+void doOperationForFacilityEmployee();
 
 void showEmployeeMenu();
 void showFacilityEmployeeMenu();
 void showManagerMenu();
 void availableAccounts(string nationalCode);
 
-Bank bank("Bank Melli Hamedan", "1150036");
+Bank *bank = new Bank("Bank Melli Hamedan", "1150036");
 
 int main()
 {
@@ -26,68 +28,46 @@ int main()
     {
         cout << "1-Employee\n2-Customer\n3-Exit" << endl;
 
+        ////////////
         // Employee
+        ////////////
         if (selectChoice() == 1)
         {
-            int eIndex = employeeLogin();
-
-            if (eIndex >= 0)
+            int i = employeeLogin();
+            if (i != -3)
             {
-                if (bank.getEmployees()->at(eIndex).getEmployeeType() == "Employee")
+                // Normal Employee
+                if (i >= 0)
+                {
+                    selectAndDoOperationForEmployee(i);
+                }
+                // Facility Employee
+                else if (i == -1)
                 {
                     showEmployeeMenu();
-                    selectAndDoOperationForEmployee(eIndex);
-                }
-                else if (bank.getEmployees()->at(eIndex).getEmployeeType() == "Facility Employee")
-                {
                     showFacilityEmployeeMenu();
-                    int choice = selectAndDoOperationForEmployee(eIndex);
+                    doOperationForFacilityEmployee();
                 }
-                else if (bank.getEmployees()->at(eIndex).getEmployeeType() == "Manager")
+                // Manager
+                else if (i == -2)
                 {
+                    showEmployeeMenu();
                     showManagerMenu();
-                    selectAndDoOperationForEmployee(eIndex);
-                    int choice = selectAndDoOperationForEmployee(eIndex);
-
-                    if (choice == 7)
-                    {
-                        cout << "Enter personal number: ";
-                        int pNumber;
-                        cin >> pNumber;
-
-                        int exist = false;
-                        for (size_t i = 0; i < bank.getEmployees()->size(); i++)
-                        {
-                            if (bank.getEmployees()->at(i).getPersonalNumber() == pNumber)
-                            {
-                                exist = true;
-                                bank.getEmployees()->at(i).showPersonalInfo();
-                            }
-                        }
-                        if (exist == false)
-                        {
-                            cerr << "There is no employee with this personal number" << endl;
-                        }
-                    }
-                    else if (choice == 8)
-                    {
-                    }
-                    else if (choice == 9)
-                    {
-                    }
+                    doOperationForManager();
                 }
             }
         }
+        ////////////
         // Customer
+        ////////////
         else if (selectChoice() == 2)
         {
             int cIndex = customerLogin();
-            availableAccounts(bank.getCustomers()->at(cIndex).getNationalCode());
+            availableAccounts(bank->getCustomers()->at(cIndex).getNationalCode());
 
             if (cIndex >= 0)
             {
-                int accIndex = bank.getCustomers()->at(cIndex).chooseWhichAccount();
-                showCustomerMenu();
+                int accIndex = bank->getCustomers()->at(cIndex).chooseWhichAccount();
                 selectAndDoOperationForCustomer(cIndex, accIndex);
             }
             else
@@ -95,9 +75,9 @@ int main()
                 cerr << "#Enter a valid number#" << endl;
             }
         }
-
-        return 0;
     }
+
+    return 0;
 }
 
 ////////////
@@ -105,29 +85,31 @@ int main()
 ////////////
 int customerLogin()
 {
-    string username = getUsername();
-    string password = getPassword();
+    string username = inputUsername();
+    string password = inputPassword();
 
-    for (size_t i = 0; i < bank.getCustomers()->size(); i++)
+    int n{-1};
+    for (size_t i = 0; i < bank->getCustomers()->size(); i++)
     {
-        if (username == bank.getCustomers()->at(i).getUsername() && password == bank.getCustomers()->at(i).getPassword())
+        if (username == bank->getCustomers()->at(i).getUsername() && password == bank->getCustomers()->at(i).getPassword())
         {
-            return i;
+            cout << "Welcome " << bank->getCustomers()->at(i).getFirstName() << " " << bank->getCustomers()->at(i).getLastName() << endl;
+            n = i;
         }
     }
 
-    return -1;
+    return n;
 }
 
 void availableAccounts(string nationalCode)
 {
     cout << "+++ Your Accounts +++++++++" << endl;
 
-    for (size_t i = 0; i < bank.getAllAccounts()->size(); i++)
+    for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
     {
-        if (nationalCode == bank.getAllAccounts()->at(i).getNationalCode())
+        if (nationalCode == bank->getAllAccounts()->at(i).getNationalCode())
         {
-            bank.getAllAccounts()->at(i).showAccountInfo();
+            bank->getAllAccounts()->at(i).showAccountInfo();
         }
     }
 }
@@ -143,6 +125,7 @@ void showCustomerMenu()
 
 void selectAndDoOperationForCustomer(int cIndex, int accIndex)
 {
+    showCustomerMenu();
     int choice = selectChoice();
 
     // Deposit
@@ -152,7 +135,7 @@ void selectAndDoOperationForCustomer(int cIndex, int accIndex)
         double amount;
         cin >> amount;
         if (amount > 0)
-            bank.getAllAccounts()->at(accIndex).deposit(amount);
+            bank->getAllAccounts()->at(accIndex).deposit(amount);
         else
             cerr << "Please enter a valid amount of money" << endl;
     }
@@ -162,17 +145,17 @@ void selectAndDoOperationForCustomer(int cIndex, int accIndex)
         double amount;
         cin >> amount;
         if (amount > 0)
-            bank.getAllAccounts()->at(accIndex).withdraw(amount);
+            bank->getAllAccounts()->at(accIndex).withdraw(amount);
         else
             cerr << "Please enter a valid amount of money" << endl;
     }
     else if (choice == 3)
     {
-        bank.getCustomers()->at(cIndex).loanRequest();
+        bank->getCustomers()->at(cIndex).loanRequest();
     }
     else if (choice == 4)
     {
-        bank.getCustomers()->at(cIndex).showAccountsInfo();
+        bank->getCustomers()->at(cIndex).showAccountsInfo();
     }
     else if (choice == 5)
     {
@@ -185,22 +168,35 @@ void selectAndDoOperationForCustomer(int cIndex, int accIndex)
 ////////////
 int employeeLogin()
 {
-    string username = getUsername();
-    string password = getPassword();
+    string username = inputUsername();
+    string password = inputPassword();
 
-    for (size_t i = 0; i < bank.getEmployees()->size(); i++)
+    int n = -4;
+    if (username == bank->getManager()->at(0).getUsername() && password == bank->getManager()->at(0).getPassword())
     {
-        if (username == bank.getEmployees()->at(i).getUsername() && password == bank.getEmployees()->at(i).getPassword())
+        n = -2;
+    }
+    else if (username == bank->getFacilityEmployee()->at(0).getUsername() && password == bank->getFacilityEmployee()->at(0).getPassword())
+    {
+        n = -1;
+    }
+    else
+    {
+        for (size_t i = 0; i < bank->getEmployees()->size(); i++)
         {
-            return i;
+            if (username == bank->getEmployees()->at(i).getUsername() && password == bank->getEmployees()->at(i).getPassword())
+            {
+                n = i;
+            }
         }
     }
 
-    return -1;
+    return n;
 }
 
 void showEmployeeMenu()
 {
+    cout << "\n**************************************" << endl;
     cout << "1-Offtime Request" << endl;
     cout << "2-Overtime Request" << endl;
     cout << "3-Show Personal Info" << endl;
@@ -222,28 +218,77 @@ void showManagerMenu()
     cout << "9-Fire An Employee" << endl;
 }
 
-int selectAndDoOperationForEmployee(int eIndex)
+void selectAndDoOperationForEmployee(int eIndex)
+{
+    while(true)
+    {
+        showEmployeeMenu();
+        cout << "10-Exit" << endl;
+        int choice = selectChoice();
+
+        if (choice == 1)
+        {
+            bank->getEmployees()->at(eIndex).offTimeReq();
+        }
+        else if (choice == 2)
+        {
+            bank->getEmployees()->at(eIndex).overtimeReq();
+        }
+        else if (choice == 3)
+        {
+            bank->getEmployees()->at(eIndex).showPersonalInfo();
+        }
+        else if (choice == 4)
+        {
+            cout << "Enter the national code: ";
+            string nCode;
+            cin >> nCode;
+            bank->getEmployees()->at(eIndex).showCustomerInfoByNationalID(nCode);
+        }
+        // Create Customer Account
+        else if (choice == 5)
+        {
+            bank->getEmployees()->at(eIndex).createNewCustomer();
+        }
+        // Delete Customer Account
+        else if (choice == 6)
+        {
+             bank->getEmployees()->at(eIndex).deleteACustomer();
+        }
+        else if(choice == 10)
+        {
+            break;
+        }
+        else
+        {
+            cerr << "Please enter a valid number" << endl;
+        }
+    }
+
+}
+
+void doOperationForManager()
 {
     int choice = selectChoice();
 
     if (choice == 1)
     {
-        bank.getEmployees()->at(eIndex).offTimeReq();
+        bank->getEmployees()->at(0).offTimeReq();
     }
     else if (choice == 2)
     {
-        bank.getEmployees()->at(eIndex).overtimeReq();
+        bank->getEmployees()->at(0).overtimeReq();
     }
     else if (choice == 3)
     {
-        bank.getEmployees()->at(eIndex).showPersonalInfo();
+        bank->getEmployees()->at(0).showPersonalInfo();
     }
     else if (choice == 4)
     {
         cout << "Enter the national code: ";
         string nCode;
         cin >> nCode;
-        bank.getEmployees()->at(eIndex).showCustomerInfoByNationalID(nCode);
+        bank->getEmployees()->at(0).showCustomerInfoByNationalID(nCode);
     }
     // Create Customer Account
     else if (choice == 5)
@@ -253,8 +298,76 @@ int selectAndDoOperationForEmployee(int eIndex)
     else if (choice == 6)
     {
     }
+    else if (choice == 7)
+    {
+        cout << "Enter personal number: ";
+        int pNumber;
+        cin >> pNumber;
 
-    return choice;
+        int exist = false;
+        for (size_t i = 0; i < bank->getEmployees()->size(); i++)
+        {
+            if (bank->getEmployees()->at(i).getPersonalNumber() == pNumber)
+            {
+                exist = true;
+                bank->getEmployees()->at(i).showPersonalInfo();
+            }
+        }
+        if (exist == false)
+        {
+            cerr << "There is no employee with this personal number" << endl;
+        }
+    }
+    else if (choice == 8)
+    {
+        bank->getManager()->at(0).hireEmployee();
+    }
+    else if (choice == 9)
+    {
+        bank->getManager()->at(0).fireEmployee();
+    }
+}
+
+void doOperationForFacilityEmployee()
+{
+    int choice = selectChoice();
+
+    if (choice == 1)
+    {
+        bank->getEmployees()->at(0).offTimeReq();
+    }
+    else if (choice == 2)
+    {
+        bank->getEmployees()->at(0).overtimeReq();
+    }
+    else if (choice == 3)
+    {
+        bank->getEmployees()->at(0).showPersonalInfo();
+    }
+    else if (choice == 4)
+    {
+        cout << "Enter the national code: ";
+        string nCode;
+        cin >> nCode;
+        bank->getEmployees()->at(0).showCustomerInfoByNationalID(nCode);
+    }
+    // Create Customer Account
+    else if (choice == 5)
+    {
+    }
+    // Delete Customer Account
+    else if (choice == 6)
+    {
+    }
+    else if (choice == 7)
+    {
+    }
+    else if (choice == 8)
+    {
+    }
+    else if (choice == 9)
+    {
+    }
 }
 
 ////////////////////
@@ -266,18 +379,4 @@ int selectChoice()
     int choice;
     cin >> choice;
     return choice;
-}
-string getUsername()
-{
-    cout << "Username: ";
-    string username;
-    getline(cin, username);
-    return username;
-}
-string getPassword()
-{
-    cout << "Password: ";
-    string password;
-    getline(cin, password);
-    return password;
 }

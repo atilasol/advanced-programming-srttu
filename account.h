@@ -2,6 +2,9 @@
 #define ACCOUNT_H
 
 #include <iostream>
+#include "bank.h"
+
+using namespace std;
 
 class Account
 {
@@ -14,7 +17,7 @@ private:
 
     string accountID;
     string nationalCode;
-    Date accountOpeningDate;
+    string accountOpeningDate;
     double balance;
     double loanAmountPotential;
     bool isActive;
@@ -23,13 +26,15 @@ private:
 
 public:
     // constructor
-    Account(string aID, string nID, Date date, double amount, bool isActive, bool lPotential, int daysForReq);
+    Account(string aID, string nID, string date, double amount, bool isActive, bool lPotential, int daysForReq);
     void deposit(double amount);
     void withdraw(double amount);
 
     void showAccountInfo();
 
     string getNationalCode();
+    string getAccountID();
+    double getLoanAmountPotential();
 };
 
 #endif // ACCOUNT_H

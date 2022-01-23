@@ -12,9 +12,9 @@ class Loan
 
 private:
     string connectedAccountID;
-    Date dateReceived;
+    string dateReceived;
     double amount;
-    double interestAmount;
+    double interestRate;
     int totalNumberOfInstallments;
     int numberOfInstallmentsPaid;
     double amountOfEachInstallment;
@@ -22,8 +22,10 @@ private:
     string serialNumber;
 
 public:
-    Loan(string aID ,string serialN , Date date ,double amount ,int nIns , int nInsPaid , int nOverdue );
+    Loan(string aID ,string serialN , string date ,double amount ,int nIns , int nInsPaid , int nOverdue );
     string getSerialNumber();
+    string getAccountID();
+    void showLoanInfo();
 };
 
 #endif // LOAN_H

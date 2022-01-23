@@ -1,17 +1,29 @@
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "date.h"
 #include "bank.h"
+
+using namespace std;
 
 // constructor
 Bank::Bank(string bName, string bCode)
     : branchName{bName}, branchCode{bCode}
 {
-    customers = new vector<Customer>();
-    employees = new vector<Employee>();
-    allAccounts = new vector<Account>();
-    loans = new vector<Loan>();
+    customers = new vector<Customer>;
+    employees = new vector<Employee>;
+    allAccounts = new vector<Account>;
+    manager = new vector<Manager>;
+    fEmployee = new vector<FacilityEmployee>;
+    loans = new vector<Loan>;
+    loanRequests = new vector<Loan>;
+
+    readCustomers();
+    readEmployees();
+    readFacilityEmployee();
+    readManager();
+    readAccounts();
+    readLoan();
 }
 
 // destructor
@@ -21,18 +33,24 @@ Bank::~Bank()
     delete[] employees;
     delete[] allAccounts;
     delete[] loans;
+    delete[] loanRequests;
+    delete[] manager;
+    delete[] fEmployee;
 }
 
 vector<Employee> *Bank::getEmployees() { return employees; }
 vector<Customer> *Bank::getCustomers() { return customers; }
 vector<Account> *Bank::getAllAccounts() { return allAccounts; }
 vector<Loan> *Bank::getLoans() { return loans; }
+vector<Loan> *Bank::getLoanReqs() { return loanRequests; }
+vector<Manager> *Bank::getManager() { return manager; }
+vector<FacilityEmployee> *Bank::getFacilityEmployee() { return fEmployee; }
 
 // read from db
 void Bank::readCustomers()
 {
     fstream fin;
-    fin.open("./Bank/customers.txt", ios::in);
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/customers.txt", ios::in);
 
     while (!fin.eof())
     {
@@ -44,7 +62,7 @@ void Bank::readCustomers()
         getline(fin, uName, '-');
         getline(fin, pass);
 
-        Customer customer(fName, lName, ID, str_to_date(bDate), uName, pass, this);
+        Customer customer(fName, lName, ID, bDate, uName, pass, this);
         customers->push_back(customer);
     }
 
@@ -53,26 +71,25 @@ void Bank::readCustomers()
 void Bank::readEmployees()
 {
     fstream fin;
-    fin.open("./Bank/employees.txt", ios::in);
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/employees.txt", ios::in);
+    int numberOfEmployees;
+    fin >> numberOfEmployees;
 
-    while (!fin.eof())
+    for (size_t i = 0; i < numberOfEmployees; i++)
     {
-        string type ,fName, lName, bDate, uName, pass, pNumber, bSalary , offH , overH;
+        string fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH;
 
-        getline(fin , type , '-');
         getline(fin, fName, '-');
         getline(fin, lName, '-');
         getline(fin, bDate, '-');
         getline(fin, uName, '-');
         getline(fin, pass, '-');
-        getline(fin, uName, '-');
-        getline(fin, pass, '-');
         getline(fin, pNumber, '-');
-        getline(fin, bSalary) , '-';
+        getline(fin, bSalary, '-');
         getline(fin, offH, '-');
         getline(fin, overH);
 
-        Employee employee(type , fName, lName, str_to_date(bDate), uName, pass, stoi(pNumber), stod(bSalary) , stod(offH) , stod(overH), this);
+        Employee employee(fName, lName, bDate, uName, pass, stod(pNumber), stod(bSalary), stod(offH), stod(overH), this);
         employees->push_back(employee);
     }
 
@@ -81,9 +98,12 @@ void Bank::readEmployees()
 void Bank::readAccounts()
 {
     fstream fin;
-    fin.open("./Bank/accounts.txt", ios::in);
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/accounts.txt", ios::in);
 
-    while (!fin.eof())
+    int numberOfAccounts;
+    fin >> numberOfAccounts;
+
+    for (size_t i = 0; i < numberOfAccounts; i++)
     {
         string aID, nID, date, balance, isActive, lPotential, daysForReq;
 
@@ -99,20 +119,65 @@ void Bank::readAccounts()
         istringstream(isActive) >> isA;
         istringstream(lPotential) >> lP;
 
-        Account account(aID, nID, str_to_date(date), stod(balance), isA, lP, stoi(daysForReq));
+        Account account(aID, nID, date, stod(balance), isA, lP, stoi(daysForReq));
         allAccounts->push_back(account);
     }
 
     fin.close();
 }
 
-// void readLoan();
+void Bank::readLoan()
+{
+}
+void Bank::readManager()
+{
+    fstream fin;
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/manager.txt", ios::in);
 
+    string fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH;
+
+    getline(fin, fName, '-');
+    getline(fin, lName, '-');
+    getline(fin, bDate, '-');
+    getline(fin, uName, '-');
+    getline(fin, pass, '-');
+    getline(fin, pNumber, '-');
+    getline(fin, bSalary, '-');
+    getline(fin, offH, '-');
+    getline(fin, overH);
+
+    Manager boss(fName, lName, bDate, uName, pass, stod(pNumber), stod(bSalary), stod(offH), stod(overH), this);
+    manager->push_back(boss);
+    fin.close();
+}
+
+void Bank::readFacilityEmployee()
+{
+    fstream fin;
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/facilityemployee.txt", ios::in);
+
+    string fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH;
+
+    getline(fin, fName, '-');
+    getline(fin, lName, '-');
+    getline(fin, bDate, '-');
+    getline(fin, uName, '-');
+    getline(fin, pass, '-');
+    getline(fin, pNumber, '-');
+    getline(fin, bSalary, '-');
+    getline(fin, offH, '-');
+    getline(fin, overH);
+
+    FacilityEmployee fEmp(fName, lName, bDate, uName, pass, stod(pNumber), stod(bSalary), stod(offH), stod(overH), this);
+    fEmployee->push_back(fEmp);
+
+    fin.close();
+}
 // write into db
 void Bank::writeCustomers()
 {
     fstream fout;
-    fout.open("./Bank/customers.txt", ios::out);
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/customers.txt", ios::out);
 
     for (size_t i = 0; i < customers->size(); i++)
     {
@@ -128,11 +193,10 @@ void Bank::writeCustomers()
 void Bank::writeEmployees()
 {
     fstream fout;
-    fout.open("./Bank/employees.txt", ios::out);
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/employees.txt", ios::out);
 
     for (size_t i = 0; i < employees->size(); i++)
     {
-        fout << employees->at(i).employeeType << "-";
         fout << employees->at(i).firstName << "-";
         fout << employees->at(i).lastName << "-";
         fout << employees->at(i).birthDate << "-";
@@ -146,7 +210,7 @@ void Bank::writeEmployees()
 void Bank::writeAccounts()
 {
     fstream fout;
-    fout.open("./Bank/accounts.txt", ios::out);
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/accounts.txt", ios::out);
 
     for (size_t i = 0; i < allAccounts->size(); i++)
     {
@@ -161,7 +225,40 @@ void Bank::writeAccounts()
     fout.close();
 }
 
-// void writeLoans();
+void Bank::writeLoans()
+{
+}
+void Bank::writeManager()
+{
+    fstream fout;
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/manager.txt", ios::out);
+
+    fout << manager->at(0).firstName << "-";
+    fout << manager->at(0).lastName << "-";
+    fout << manager->at(0).birthDate << "-";
+    fout << manager->at(0).username << "-";
+    fout << manager->at(0).password << "-";
+    fout << manager->at(0).personalNumber << "-";
+    fout << manager->at(0).basicSalary << endl;
+
+    fout.close();
+}
+
+void Bank::writeFacilityEmployee()
+{
+    fstream fout;
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/facilityemployee.txt", ios::out);
+
+    fout << fEmployee->at(0).firstName << "-";
+    fout << fEmployee->at(0).lastName << "-";
+    fout << fEmployee->at(0).birthDate << "-";
+    fout << fEmployee->at(0).username << "-";
+    fout << fEmployee->at(0).password << "-";
+    fout << fEmployee->at(0).personalNumber << "-";
+    fout << fEmployee->at(0).basicSalary << endl;
+
+    fout.close();
+}
 
 void Bank::dailyReporting()
 {
@@ -174,9 +271,9 @@ void Bank::dailyReporting()
 string Bank::todayDate()
 {
     fstream fin;
-    fin.open("/DataBase/time.txt" , ios::in);
+    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/time.txt", ios::in);
     string today;
-    getline(fin , today);
+    getline(fin, today);
     fin.close();
 
     return today;

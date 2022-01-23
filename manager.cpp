@@ -1,7 +1,12 @@
-#include <iostream>
 #include "manager.h"
-#include "bank.h"
-#include "date.h"
+
+string inputFirstname();
+string inputLastname();
+string inputBirthdate();
+string inputNationalCode();
+string inputUsername();
+string inputPassword();
+double getBasicSalary();
 
 class employeeExistException
 {
@@ -10,8 +15,8 @@ class usernameExistException
 {
 };
 
-Manager::Manager(string type, string fName, string lName, Date bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b)
-    : Employee(type, fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH, b)
+Manager::Manager(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b)
+    : Employee(fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH, b)
 {
 }
 
@@ -31,7 +36,7 @@ void Manager::hireEmployee()
     cout << "Please enter the information" << endl;
     string firstName;
     string lastName;
-    Date birthDate;
+    string birthDate;
     string username;
     string password;
     int personalNumber;
@@ -52,11 +57,11 @@ void Manager::hireEmployee()
         break;
     }
 
-    birthDate = getBirthDate();
+    birthDate = inputBirthdate();
 
     while (true)
     {
-        username = getUserName();
+        username = inputUsername();
         for (size_t i = 0; i < bank->employees->size(); i++)
         {
             if (username == bank->employees->at(i).getUsername())
@@ -71,57 +76,40 @@ void Manager::hireEmployee()
     basicSalary = getBasicSalary();
 }
 
-// non-member functions
-string getFirstName()
+void Manager::fireEmployee()
 {
-    cout << "First name :";
-    string firstName;
-    getline(cin, firstName);
-    return firstName;
-}
-string getLastName()
-{
-    cout << "Last name :";
-    string lastName;
-    getline(cin, lastName);
-    return lastName;
-}
+    cout << "Enter the personal number: ";
+    int pNumber;
+    cin >> pNumber;
 
-Date getBirthDate()
-{
-    int day, month, year;
-    cout << "Day: ";
-    cin >> day;
-    cout << "Month: ";
-    cin >> month;
-    cout << "Year: ";
-    cin >> year;
+    for (size_t i = 0; i < bank->getEmployees()->size(); i++)
+    {
+        if (bank->getEmployees()->at(i).getPersonalNumber() == pNumber)
+        {
+            bank->getEmployees()->at(i).showPersonalInfo();
+            cout << "Fire this employee? ";
+            string yesOrno;
+            cin >> yesOrno;
+            if (yesOrno == "yes")
+            {
+                // bank->getEmployees()->erase();
 
-    return Date(day, month, year);
-}
-
-string getUserName()
-{
-    cout << "Username :";
-    string userName;
-    getline(cin, userName);
-    return userName;
-}
-
-string getPassword()
-{
-    cout << "Password :";
-    string password;
-    getline(cin, password);
-    return password;
-}
-
-// implement personal number
-
-double getBasicSalary()
-{
-    cout << "Basic Salary : ";
-    double basicSalary;
-    cin >> basicSalary;
-    return basicSalary;
+                // Shifting elements
+                for (size_t j = i; j < bank->getEmployees()->size() - 1; j++)
+                {
+                    bank->getEmployees()->at(j) = bank->getEmployees()->at(j + 1);
+                }
+                bank->getEmployees()->at(bank->getEmployees()->size() - 2) = bank->getEmployees()->at(bank->getEmployees()->size() - 1);
+                bank->getEmployees()->pop_back();
+            }
+            else if (yesOrno == "no")
+            {
+                break;
+            }
+            else
+            {
+                cerr << "Please enter a valid string" << endl;
+            }
+        }
+    }
 }

@@ -1,15 +1,17 @@
 #ifndef EMPLOYEE_H
 #define EMPLOYEE_H
 
+
 #include <iostream>
-#include "bank.h"
-#include "date.h"
+
+class Bank;
 
 using namespace std;
 
 class Employee
 {
     friend class Bank;
+
 private:
     static constexpr double offTimePerMonth = 15;
     static constexpr double overTimePerMonth = 12;
@@ -17,10 +19,9 @@ private:
     static constexpr double salaryIncrease = 120000;
 
 protected:
-    string employeeType;
     string firstName;
     string lastName;
-    Date birthDate;
+    string birthDate;
     string username;
     string password;
     int personalNumber;
@@ -31,14 +32,13 @@ protected:
     Bank *bank;
 
 public:
-    Employee(string type ,string fName , string lName , Date bDate , string uName , string pass , int pNumber ,double bSalary , double offH , double overH,Bank *b);
+    Employee(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b);
 
     void showPersonalInfo();
     string getFirstName();
     string getLastName();
     string getUsername();
     string getPassword();
-    string getEmployeeType();
     int getPersonalNumber();
 
     void offTimeReq();
@@ -47,6 +47,9 @@ public:
     void showCustomerInfoByNationalID(string nationalCode);
     void activateAccount(string accountID);
     void deactivateAccount(string accountID);
+
+    void createNewCustomer();
+    void deleteACustomer();
 };
 
 #endif // EMPLOYEE_H
