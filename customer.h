@@ -33,10 +33,11 @@ public:
     string getNationalCode();
 
     int chooseWhichAccount();
-    void loanRequest();
+    void loanRequest(int accIndex);
     void showPersonalInfo();
     void showAccountsInfo();
     void showLoansInfo();
+    void changePassword();
 };
 
 #endif // CUSTOMER_H

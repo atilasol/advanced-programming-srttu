@@ -1,7 +1,6 @@
 #ifndef EMPLOYEE_H
 #define EMPLOYEE_H
 
-
 #include <iostream>
 
 class Bank;
@@ -32,7 +31,9 @@ protected:
     Bank *bank;
 
 public:
-    Employee(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b);
+    Employee(string fName, string lName, string bDate, string uName, string pass, int pNum ,double bSalary, double offH, double overH, Bank *b);
+    Employee(string fName, string lName, string bDate, string uName, string pass, double bSalary, double offH, double overH, Bank *b);
+    Employee();
 
     void showPersonalInfo();
     string getFirstName();
@@ -48,8 +49,10 @@ public:
     void activateAccount(string accountID);
     void deactivateAccount(string accountID);
 
-    void createNewCustomer();
-    void deleteACustomer();
+    void createNewCustomer(string nationalCode , double amount);
+    void deleteCustomer(string nationalCode);
+    void createAccount(string nationalCode);
+    void deleteAccount();
 };
 
 #endif // EMPLOYEE_H

@@ -1,4 +1,6 @@
 #include "manager.h"
+#include "./Exceptions/employeeExistEx.h"
+#include "./Exceptions/usernameExistEx.h"
 
 string inputFirstname();
 string inputLastname();
@@ -6,17 +8,14 @@ string inputBirthdate();
 string inputNationalCode();
 string inputUsername();
 string inputPassword();
-double getBasicSalary();
+double inputBasicSalary();
 
-class employeeExistException
+Manager::Manager(string fName, string lName, string bDate, string uName, string pass, int pNum, double bSalary, double offH, double overH, Bank *b)
+    : Employee(fName, lName, bDate, uName, pass, pNum, bSalary, offH, overH, b)
 {
-};
-class usernameExistException
-{
-};
-
-Manager::Manager(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b)
-    : Employee(fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH, b)
+}
+Manager::Manager(string fName, string lName, string bDate, string uName, string pass, double bSalary, double offH, double overH, Bank *b)
+    : Employee(fName, lName, bDate, uName, pass, bSalary, offH, overH, b)
 {
 }
 
@@ -44,17 +43,31 @@ void Manager::hireEmployee()
 
     while (true)
     {
-        firstName = getFirstName();
-        lastName = getLastName();
+        firstName = inputFirstname();
+        lastName = inputLastname();
 
-        for (size_t i = 0; i < bank->employees->size(); i++)
+        bool nameExist = false;
+        try
         {
-            if (firstName == bank->employees->at(i).getFirstName() && lastName == bank->employees->at(i).getLastName())
+            for (size_t i = 0; i < bank->employees->size(); i++)
             {
-                throw employeeExistException();
+                if (firstName == bank->employees->at(i).getFirstName() && lastName == bank->employees->at(i).getLastName())
+                {
+                    nameExist = true;
+                    throw employeeExistEx();
+                }
             }
         }
-        break;
+        catch(const employeeExistEx &e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+
+        if (nameExist == false)
+        {
+            break;
+        }
+        
     }
 
     birthDate = inputBirthdate();
@@ -62,18 +75,35 @@ void Manager::hireEmployee()
     while (true)
     {
         username = inputUsername();
-        for (size_t i = 0; i < bank->employees->size(); i++)
+        bool usernameExist = false;
+        try
         {
-            if (username == bank->employees->at(i).getUsername())
+            for (size_t i = 0; i < bank->employees->size(); i++)
             {
-                throw usernameExistException();
+                if (username == bank->employees->at(i).getUsername())
+                {
+                    usernameExist = true;
+                    throw usernameExistEx();
+                }
             }
         }
-        break;
+        catch(const usernameExistEx &e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
+        if(usernameExist == false)
+        {
+            break;
+        }
+        
     }
-    password = getPassword();
+    password = inputPassword();
     // implemtn personal number
-    basicSalary = getBasicSalary();
+    basicSalary = inputBasicSalary();
+
+    Employee employee(firstName , lastName , birthDate , username , password , basicSalary , 0 , 0 , this->bank);
+    bank->employees->push_back(employee);
 }
 
 void Manager::fireEmployee()
@@ -92,15 +122,9 @@ void Manager::fireEmployee()
             cin >> yesOrno;
             if (yesOrno == "yes")
             {
-                // bank->getEmployees()->erase();
-
-                // Shifting elements
-                for (size_t j = i; j < bank->getEmployees()->size() - 1; j++)
-                {
-                    bank->getEmployees()->at(j) = bank->getEmployees()->at(j + 1);
-                }
-                bank->getEmployees()->at(bank->getEmployees()->size() - 2) = bank->getEmployees()->at(bank->getEmployees()->size() - 1);
-                bank->getEmployees()->pop_back();
+                vector<Employee>::iterator it;
+                it = bank->getEmployees()->begin() + i;
+                bank->getEmployees()->erase(it);
             }
             else if (yesOrno == "no")
             {

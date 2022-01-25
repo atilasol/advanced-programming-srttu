@@ -15,6 +15,7 @@ class Employee;
 class Manager;
 class FacilityEmployee;
 class Account;
+class Loan;
 
 using namespace std;
 
@@ -30,6 +31,7 @@ protected:
     vector<Loan> *loans;
     vector<Loan> *loanRequests;
     vector<Manager> *manager;
+    vector<int> *numOfComponents;
     vector<FacilityEmployee> *fEmployee;
     string branchName;
     string branchCode;
@@ -45,23 +47,25 @@ public:
     vector<Loan> *getLoanReqs();
     vector<Manager> *getManager();
     vector<FacilityEmployee> *getFacilityEmployee();
+
     // Read from db
+    void readNumOfComponents();
     void readCustomers();
     void readEmployees();
     void readAccounts();
     void readLoan();
+    void readLoanReqs();
     void readManager();
     void readFacilityEmployee();
     // write into db
+    void writeNumOfComponents();
     void writeCustomers();
     void writeEmployees();
     void writeAccounts();
     void writeLoans();
     void writeManager();
     void writeFacilityEmployee();
-
-    string todayDate();
-
+    void writeLoanReqs();
     void dailyReporting();
 };
 

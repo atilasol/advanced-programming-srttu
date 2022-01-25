@@ -23,6 +23,7 @@ private:
     bool isActive;
     bool loanReqPotential;
     int daysMoreThanMinBalance;
+    bool haveLoan;
 
 public:
     // constructor
@@ -32,8 +33,10 @@ public:
 
     void showAccountInfo();
 
+    double getBalance();
     string getNationalCode();
     string getAccountID();
+    bool getStatus();
     double getLoanAmountPotential();
 };
 

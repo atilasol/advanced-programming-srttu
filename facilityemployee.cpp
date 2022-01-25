@@ -1,20 +1,40 @@
 #include "facilityemployee.h"
+#include "/home/atila/Dropbox/BankingManagementSystemProject/Exceptions/accountIsNotActiveEx.h"
 
-FacilityEmployee::FacilityEmployee(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b)
-    : Employee(fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH, b)
+FacilityEmployee::FacilityEmployee(string fName, string lName, string bDate, string uName, string pass, int pNum, double bSalary, double offH, double overH, Bank *b)
+    : Employee(fName, lName, bDate, uName, pass, pNum, bSalary, offH, overH, b)
 {
 }
-
+FacilityEmployee::FacilityEmployee(string fName, string lName, string bDate, string uName, string pass, double bSalary, double offH, double overH, Bank *b)
+    : Employee(fName, lName, bDate, uName, pass, bSalary, offH, overH, b)
+{
+}
 void FacilityEmployee::deactivateAllAccountsByNationalCode()
 {
-    cout << "Enter a national code : ";
-    string nCode;
-    cin >> nCode;
-    for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+    while (true)
     {
-        if (bank->getAllAccounts()->at(i).getNationalCode() == nCode)
+        cout << "Enter the national code : ";
+        string nCode;
+        cin >> nCode;
+
+        bool nationalCodeExist = false;
+
+        for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
         {
-            this->deactivateAccount(bank->getAllAccounts()->at(i).getAccountID());
+            if (bank->getAllAccounts()->at(i).getNationalCode() == nCode)
+            {
+                nationalCodeExist = true;
+                this->deactivateAccount(bank->getAllAccounts()->at(i).getAccountID());
+                break;
+            }
+        }
+        if (nationalCodeExist == false)
+        {
+            cerr << "# No account found with this national code. Try again #" << endl;
+        }
+        else
+        {
+            break;
         }
     }
 }
@@ -29,36 +49,62 @@ void FacilityEmployee::showAllLoanRequests()
 
 void FacilityEmployee::checkLoanReq()
 {
-    cout << "First Loan Request" << endl;
-    bank->getLoanReqs()->at(0).showLoanInfo();
-    cout << "Agree? ";
-    string yesOrno;
-    if (yesOrno == "yes")
+    if (!bank->getLoanReqs()->empty())
     {
-        for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
-        {
-            if (bank->getLoanReqs()->at(0).getAccountID() == bank->getAllAccounts()->at(i).getAccountID())
-            {
-                bank->getAllAccounts()->at(i).deposit(bank->getAllAccounts()->at(i).getLoanAmountPotential());
-                cout << "Loan amount transfered successfuly to the account\nLoan details has been sent to the customer" << endl;
-                bank->getLoans()->push_back(bank->getLoanReqs()->at(0));
+        cout << "First Loan Request" << endl;
+        bank->getLoanReqs()->at(0).showLoanInfo();
+        cout << "Agree? ";
+        string yesOrno;
+        cin >> yesOrno;
 
-                // deleting the first line of loan reqs
-                // shifing elements
-                // write and read loan reqs
-                // write and read loans
+        if (yesOrno == "yes")
+        {
+            for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
+            {
+                if (bank->getLoanReqs()->at(0).getAccountID() == bank->getAllAccounts()->at(i).getAccountID())
+                {
+                    bank->getAllAccounts()->at(i).deposit(bank->getAllAccounts()->at(i).getLoanAmountPotential());
+                    cout << "Loan amount transfered successfuly to the account\nLoan details has been sent to the customer" << endl;
+                    bank->getLoans()->push_back(bank->getLoanReqs()->at(0));
+
+                    bank->getLoanReqs()->erase(bank->getLoanReqs()->begin());
+
+                    break;
+                }
             }
         }
-    }
-    else if (yesOrno == "no")
-    {
-        return;
+        else if (yesOrno == "no")
+        {
+            return;
+        }
+        else
+            cerr << "Enter a valid string " << endl;
     }
     else
-        cerr << "Enter a valid string " << endl;
+    {
+        cout << "# There is no loan requests #" << endl;
+    }
 }
 
 void FacilityEmployee::showLoanInfoBasedOnSerialNumber()
 {
-    
+    string serialNum;
+    cout << "Enter serial number: ";
+    cin >> serialNum;
+
+    bool serialNumExist = false;
+
+    for (size_t i = 0; i < bank->getLoans()->size(); i++)
+    {
+        if (serialNum == bank->getLoans()->at(i).getSerialNumber())
+        {
+            serialNumExist = true;
+            bank->getLoans()->at(i).showLoanInfo();
+        }
+    }
+
+    if (serialNumExist == false)
+    {
+        cerr << "# There is no employee with this serial number #" << endl;
+    }
 }

@@ -1,11 +1,10 @@
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include "customer.h"
 #include "bank.h"
-
-class cannotSendLoanReqException
-{
-};
+#include "report.h"
+#include "./Exceptions/cannotSendLoanReqEx.h"
 
 string generateSerialNumber(Bank *bank);
 int chooseNumberOfInstallments();
@@ -24,63 +23,62 @@ string Customer::getNationalCode() { return nationalCode; }
 
 int Customer::chooseWhichAccount()
 {
-    vector<string> IDs;
-    vector<int> accountIndices;
-    for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
-    {
-        if (bank->getAllAccounts()->at(i).nationalCode == nationalCode)
-        {
-            IDs.push_back(bank->getAllAccounts()->at(i).accountID);
-            accountIndices.push_back(i);
-        }
-    }
+    int accIndex = -1;
     while (true)
     {
         cout << "Account ID :";
         string accountID;
         cin >> accountID;
 
-        for (size_t i = 0; i < IDs.size(); i++)
+        for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
         {
-            if (accountID == IDs.at(i))
+            if (bank->getAllAccounts()->at(i).getAccountID() == accountID)
             {
-                return accountIndices.at(i);
-                break;
+                accIndex = i;
             }
         }
-    }
-}
-
-void Customer::loanRequest()
-{
-    string accountIDs;
-    bool loanPot = false;
-    for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
-    {
-        if (bank->getAllAccounts()->at(i).loanReqPotential == true)
+        if (accIndex != -1)
         {
-            cout << "You can send loan request for this account" << endl;
-            bank->getAllAccounts()->at(i).showAccountInfo();
-            loanPot = true;
+            break;
+        }
+        else
+        {
+            cerr << "Please enter a valid account ID" << endl;
         }
     }
-    if (loanPot == false)
-    {
-        throw cannotSendLoanReqException();
-    }
-    else
-    {
-        int accIndex = chooseWhichAccount();
-        fstream fout;
-        fout.open("./DataBase/loanReq", ios::app);
-        fout << bank->getAllAccounts()->at(accIndex).accountID << "-";
-        fout << generateSerialNumber(bank) << "-";
-        fout << bank->todayDate() << "-";
-        fout << bank->getAllAccounts()->at(accIndex).loanAmountPotential << "-";
-        fout << chooseNumberOfInstallments() << "-0-0";
+    return accIndex;
+}
 
-        cout << "Loan request sent successfuly" << endl;
-        fout.close();
+void Customer::loanRequest(int accIndex)
+{
+    try
+    {
+        if (bank->getAllAccounts()->at(accIndex).loanReqPotential)
+        {
+            fstream fout;
+            fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loanReqs.txt", ios::app);
+            fout << bank->getAllAccounts()->at(accIndex).accountID << "-";
+            Report report;
+            fout << report.todayDate() << "-";
+
+            fout << generateSerialNumber(this->bank) << "-";
+            fout << setprecision(1);
+            fout << fixed;
+            fout << bank->getAllAccounts()->at(accIndex).loanAmountPotential << "-";
+
+            int nIns = chooseNumberOfInstallments();
+            fout << nIns << "-0-0" << endl;
+            
+            cout << "Loan request sent successfuly" << endl;
+
+            fout.close();
+        }
+        else
+            throw cannotSendLoanReqEx();
+    }
+    catch (const cannotSendLoanReqEx &e)
+    {
+        std::cerr << e.what() << '\n';
     }
 }
 
@@ -90,25 +88,21 @@ void Customer::showPersonalInfo()
     cout << "Name : " << firstName << " " << lastName << endl;
     cout << "Birth date :" << birthDate << " | National Id : " << nationalCode << endl;
     cout << "============================================" << endl;
-    while (true)
+
+    cout << "1-Show accounts information\n2-Show loans information\nSelect:";
+    char choose;
+    cin >> choose;
+    if (choose == '1')
     {
-        cout << "1-Show accounts information\n2-Show loans information\nSelect:";
-        char choose;
-        cin >> choose;
-        if (choose == '1')
-        {
-            showAccountsInfo();
-            break;
-        }
-        else if (choose == '2')
-        {
-            showLoansInfo();
-            break;
-        }
-        else
-        {
-            cerr << "#Enter a valid number#" << endl;
-        }
+        showAccountsInfo();
+    }
+    else if (choose == '2')
+    {
+        showLoansInfo();
+    }
+    else
+    {
+        cerr << "#Enter a valid number#" << endl;
     }
 }
 
@@ -116,9 +110,12 @@ void Customer::showAccountsInfo()
 {
     for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
     {
-        cout << "\n=== Account " << i + 1 << " ==========" << endl;
-        bank->getAllAccounts()->at(i).showAccountInfo();
-        cout << "============================================" << endl;
+        if (this->getNationalCode() == bank->getAllAccounts()->at(i).getNationalCode())
+        {
+            cout << "\n=== Account " << i + 1 << " ==========" << endl;
+            bank->getAllAccounts()->at(i).showAccountInfo();
+            cout << "============================================" << endl;
+        }
     }
 }
 void Customer::showLoansInfo()
@@ -127,6 +124,7 @@ void Customer::showLoansInfo()
 
 string generateSerialNumber(Bank *bank)
 {
+    srand(time(0));
     int serialNumber = rand() % 999999999;
     string number = to_string(serialNumber);
     number = number.substr(0, 8);
@@ -166,4 +164,20 @@ int chooseNumberOfInstallments()
             cerr << "Please enter a valid number" << endl;
         }
     }
+}
+
+void Customer::changePassword()
+{
+    cout << "Your current password : " << getPassword() << endl;
+    cout << "Enter new password : ";
+    string newPass;
+    cin >> newPass;
+    if (newPass != this->getPassword())
+    {
+        password = newPass;
+        Report report;
+        report.changePassword(this->getFirstName(), this->getLastName(), this->getNationalCode());
+    }
+    else
+        cerr << "Enter a new password" << endl;
 }

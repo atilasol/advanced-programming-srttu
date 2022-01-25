@@ -1,5 +1,10 @@
 #include <iomanip>
+#include <fstream>
+#include "report.h"
 #include "bank.h"
+#include "./Exceptions/aboveOverTimeRequestEx.h"
+#include "./Exceptions/customerExistEx.h"
+#include "./Exceptions/usernameExistEx.h"
 
 string inputFirstname();
 string inputLastname();
@@ -7,26 +12,30 @@ string inputBirthdate();
 string inputNationalCode();
 string inputUsername();
 string inputPassword();
-double getBasicSalary();
+double inputBasicSalary();
+string generateAccountID();
+int generatePersonalNum();
 
-class aboveOverTimeRequestException
-{
-};
-class customerExistException
-{
-};
-class usernameExistException
-{
-};
-
-Employee::Employee(string fName, string lName, string bDate, string uName, string pass, int pNumber, double bSalary, double offH, double overH, Bank *b)
-    : firstName{fName}, lastName{lName}, personalNumber{pNumber}, birthDate{bDate}, username{uName}, password{pass}, basicSalary{bSalary}, offTimeHours{offH}, overTimeHours{overH}
+Employee::Employee(string fName, string lName, string bDate, string uName, string pass, int pNum, double bSalary, double offH, double overH, Bank *b)
+    : firstName{fName}, lastName{lName}, birthDate{bDate}, username{uName}, password{pass}, personalNumber{pNum}, basicSalary{bSalary}, offTimeHours{offH}, overTimeHours{overH}
 {
     cout << setprecision(1);
     cout << fixed << endl;
     this->bank = b;
     overallSalary = basicSalary;
 }
+
+Employee::Employee(string fName, string lName, string bDate, string uName, string pass, double bSalary, double offH, double overH, Bank *b)
+    : firstName{fName}, lastName{lName}, birthDate{bDate}, username{uName}, password{pass}, basicSalary{bSalary}, offTimeHours{offH}, overTimeHours{overH}
+{
+    personalNumber = generatePersonalNum();
+
+    cout << setprecision(1);
+    cout << fixed << endl;
+    this->bank = b;
+    overallSalary = basicSalary;
+}
+Employee::Employee() = default;
 
 void Employee::showPersonalInfo()
 {
@@ -57,6 +66,9 @@ void Employee::offTimeReq()
         cout << fixed << endl;
         overallSalary -= ((offTimeHours - offTimePerMonth) * salaryReduction);
         cout << "Yor overall salary will be : " << overallSalary << " after these offtimes!" << endl;
+
+        Report report;
+        report.getOfftime(this->getPersonalNumber(), hours);
     }
     else
     {
@@ -81,7 +93,7 @@ void Employee::overtimeReq()
     }
     else
     {
-        throw aboveOverTimeRequestException();
+        throw aboveOverTimeRequestEx();
     }
 }
 
@@ -123,45 +135,49 @@ void Employee::deactivateAccount(string accountID)
         if (accountID == bank->allAccounts->at(i).accountID)
         {
             if (bank->allAccounts->at(i).isActive)
-                bank->allAccounts->at(i).isActive = true;
+            {
+                bank->allAccounts->at(i).isActive = false;
+                Report report;
+                report.deactivated(bank->getAllAccounts()->at(i).getNationalCode(), bank->getAllAccounts()->at(i).getAccountID());
+            }
             else
                 std::cerr << "Account is already NOT active" << std::endl;
         }
     }
 }
 
-void Employee::createNewCustomer()
+void Employee::createNewCustomer(string nationalCode, double amount)
 {
     cout << "Please enter the information : " << endl;
-    string firstName, lastName, nationalCode, birthDate, username, password;
+    string firstName, lastName, birthDate, username, password;
 
     while (true)
     {
         firstName = inputFirstname();
         lastName = inputLastname();
 
-        for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+        bool customerExist = false;
+        try
         {
-            if (firstName == bank->getCustomers()->at(i).getFirstName() && lastName == bank->getCustomers()->at(i).getLastName())
+            for (size_t i = 0; i < bank->getCustomers()->size(); i++)
             {
-                throw customerExistException();
+                if (firstName == bank->getCustomers()->at(i).getFirstName() && lastName == bank->getCustomers()->at(i).getLastName())
+                {
+                    customerExist = true;
+                    throw customerExistEx();
+                }
             }
         }
-        break;
-    }
-
-    while (true)
-    {
-        nationalCode = inputNationalCode();
-
-        for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+        catch (const customerExistEx &e)
         {
-            if (nationalCode == bank->getCustomers()->at(i).getNationalCode())
-            {
-                throw customerExistException();
-            }
+            std::cerr << e.what() << '\n';
         }
-        break;
+
+        if (customerExist == false)
+        {
+
+            break;
+        }
     }
 
     birthDate = inputBirthdate();
@@ -169,23 +185,123 @@ void Employee::createNewCustomer()
     while (true)
     {
         username = inputUsername();
-        for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+        bool usernameExist = false;
+        try
         {
-            if (username == bank->getCustomers()->at(i).getUsername())
+            for (size_t i = 0; i < bank->getCustomers()->size(); i++)
             {
-                throw usernameExistException();
+                if (username == bank->getCustomers()->at(i).getUsername())
+                {
+                    usernameExist = true;
+                    throw usernameExistEx();
+                }
             }
         }
-        break;
+        catch (const usernameExistEx &e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+
+        if (usernameExist == false)
+        {
+            break;
+        }
     }
     password = inputPassword();
 
     Customer customer(firstName, lastName, nationalCode, birthDate, username, password, bank);
     bank->customers->push_back(customer);
+
     cout << "Customer \"" << firstName << " " << lastName << "\" added successfuly" << endl;
+    Report report;
+
+    Account account(generateAccountID(), nationalCode, report.todayDate(), amount, 1, 0, 0);
+    bank->getAllAccounts()->push_back(account);
+
+    report.newCustomer(nationalCode);
 }
-void Employee::deleteACustomer()
+
+void Employee::deleteCustomer(string nationalCode)
 {
+    for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+    {
+        if (bank->getCustomers()->at(i).getNationalCode() == nationalCode)
+        {
+            vector<Customer>::iterator it;
+            it = bank->getCustomers()->begin() + i;
+            bank->getCustomers()->erase(it);
+        }
+    }
+}
+
+void Employee::createAccount(string nationalCode)
+{
+    while (true)
+    {
+        double balance;
+        cout << "Balance (Should be more than 50000): ";
+        cin >> balance;
+
+        bool customerExist = false;
+        if (balance > 50000)
+        {
+            for (size_t i = 0; i < bank->getCustomers()->size(); i++)
+            {
+                if (nationalCode == bank->getCustomers()->at(i).getNationalCode())
+                {
+                    customerExist = true;
+                    Report report;
+                    Account account(generateAccountID(),  bank->getCustomers()->at(i).getNationalCode(), report.todayDate(), balance, 1, 0, 0);
+                    bank->getAllAccounts()->push_back(account);
+                }
+            }
+
+            if (customerExist)
+            {
+                break;
+            }
+            else
+            {
+                createNewCustomer(nationalCode, balance);
+                break;
+            }
+        }
+        else
+        {
+            cerr << "Min balance should be more than 50000 for creating new account" << endl;
+        }
+    }
+}
+
+void Employee::deleteAccount()
+{
+    string nCode = inputNationalCode();
+    for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
+    {
+        if (nCode == bank->getAllAccounts()->at(i).getNationalCode())
+        {
+            vector<Account>::iterator it;
+            it = bank->allAccounts->begin() + i;
+            bank->getAllAccounts()->erase(it);
+
+            cout << "Account deleted successfully" << endl;
+            Report report;
+            report.deleteAccount(nCode);
+
+            bool anotherAccount = false;
+            for (size_t j = 0; j < bank->getAllAccounts()->size(); j++)
+            {
+                if (nCode == bank->getAllAccounts()->at(j).getNationalCode())
+                {
+                    anotherAccount = true;
+                }
+            }
+            if (anotherAccount == false)
+            {
+                deleteCustomer(nCode);
+            }
+        }
+    }
 }
 
 // non-member functions
@@ -238,10 +354,28 @@ string inputPassword()
 
 // implement personal number
 
-double getBasicSalary()
+double inputBasicSalary()
 {
     cout << "Basic Salary : ";
     double basicSalary;
     cin >> basicSalary;
     return basicSalary;
+}
+
+string generateAccountID()
+{
+    srand(time(0));
+    int accountID = rand() % 999999999;
+    string number = to_string(accountID);
+    number = number.substr(0, 8);
+
+    return number;
+}
+
+int generatePersonalNum()
+{
+    srand(time(0));
+    int personalNum = rand() % 999;
+
+    return personalNum;
 }
