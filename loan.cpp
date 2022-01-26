@@ -24,6 +24,7 @@ int Loan::getNumberOfInstallments() { return totalNumberOfInstallments; }
 int Loan::getNumberOfPaidInstallments() { return numberOfInstallmentsPaid; }
 double Loan::getAmountOfEachInstallment() { return amountOfEachInstallment; }
 int Loan::getNumberOfWarnings() { return numberOfWarnings; }
+double Loan::getAmountOfLoan() { return amount;}
 
 void Loan::setWarning() { numberOfWarnings++; }
 
@@ -33,4 +34,5 @@ void Loan::showLoanInfo()
     cout << "Serial Number : " << serialNumber << endl;
     cout << "Amount Remain: " << amount << endl;
     cout << "Installments: " << totalNumberOfInstallments << " | Paid: " << numberOfInstallmentsPaid << " | Remain Ins: " << totalNumberOfInstallments - numberOfInstallmentsPaid << endl;
+    cout << "Amount Of Each Installment : " << amountOfEachInstallment << endl;
 }

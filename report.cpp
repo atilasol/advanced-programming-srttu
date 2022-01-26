@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iomanip>
 #include "report.h"
 #include "date.h"
 
@@ -35,6 +36,8 @@ void Report::deposit(string nationalCode, double amount)
 {
     fstream fapp;
     fapp.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/dailyReport.txt", ios::app);
+    fapp << setprecision(0);
+    fapp << fixed;
     fapp << "[" << todayDate() << " " << now() << "] Deposit " << amount << " to Account with national code " << nationalCode << endl;
     fapp.close();
 }
@@ -42,6 +45,8 @@ void Report::withdrawal(string nationalCode, double amount)
 {
     fstream fapp;
     fapp.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/dailyReport.txt", ios::app);
+    fapp << setprecision(0);
+    fapp << fixed;
     fapp << "[" << todayDate() << " " << now() << "] Withrawal " << amount << " from Account with national code " << nationalCode << endl;
     fapp.close();
 }
@@ -49,6 +54,8 @@ void Report::getLoan(string nationalCode, double value)
 {
     fstream fapp;
     fapp.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/dailyReport.txt", ios::app);
+    fapp << setprecision(0);
+    fapp << fixed;
     fapp << "[" << todayDate() << " " << now() << "] Account with national code " << nationalCode << " got " << value << " as loan" << endl;
     fapp.close();
 }

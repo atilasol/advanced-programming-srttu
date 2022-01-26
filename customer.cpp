@@ -55,23 +55,13 @@ void Customer::loanRequest(int accIndex)
     {
         if (bank->getAllAccounts()->at(accIndex).loanReqPotential)
         {
-            fstream fout;
-            fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loanReqs.txt", ios::app);
-            fout << bank->getAllAccounts()->at(accIndex).accountID << "-";
             Report report;
-            fout << report.todayDate() << "-";
-
-            fout << generateSerialNumber(this->bank) << "-";
-            fout << setprecision(1);
-            fout << fixed;
-            fout << bank->getAllAccounts()->at(accIndex).loanAmountPotential << "-";
-
             int nIns = chooseNumberOfInstallments();
-            fout << nIns << "-0-0" << endl;
-            
+            string serialNum = generateSerialNumber(this->bank);
             cout << "Loan request sent successfuly" << endl;
 
-            fout.close();
+            Loan loanReq(bank->getAllAccounts()->at(accIndex).accountID, serialNum, report.todayDate(), bank->getAllAccounts()->at(accIndex).loanAmountPotential, nIns, 0, 0, 0);
+            bank->getLoanReqs()->push_back(loanReq);
         }
         else
             throw cannotSendLoanReqEx();
@@ -120,6 +110,19 @@ void Customer::showAccountsInfo()
 }
 void Customer::showLoansInfo()
 {
+    for (size_t i = 0; i < bank->getAllAccounts()->size(); i++)
+    {
+        if (this->getNationalCode() == bank->getAllAccounts()->at(i).getNationalCode())
+        {
+            for (size_t j = 0; j < bank->getLoans()->size(); j++)
+            {
+                if (bank->getAllAccounts()->at(i).getAccountID() == bank->getLoans()->at(j).getAccountID())
+                {
+                    bank->getLoans()->at(j).showLoanInfo();
+                }
+            }
+        }
+    }
 }
 
 string generateSerialNumber(Bank *bank)

@@ -28,6 +28,7 @@ public:
     Loan(string accID, string serialN, string date, double amount, int nIns, int nInsPaid, int nOverdue, int warnings);
     Loan(string accID, string date, double amount, int nIns);
 
+    double getAmountOfLoan();
     string getSerialNumber();
     string getAccountID();
     int getNumberOfInstallments();

@@ -1,4 +1,5 @@
 #include "facilityemployee.h"
+#include "report.h"
 #include "/home/atila/Dropbox/BankingManagementSystemProject/Exceptions/accountIsNotActiveEx.h"
 
 FacilityEmployee::FacilityEmployee(string fName, string lName, string bDate, string uName, string pass, int pNum, double bSalary, double offH, double overH, Bank *b)
@@ -65,9 +66,14 @@ void FacilityEmployee::checkLoanReq()
                 {
                     bank->getAllAccounts()->at(i).deposit(bank->getAllAccounts()->at(i).getLoanAmountPotential());
                     cout << "Loan amount transfered successfuly to the account\nLoan details has been sent to the customer" << endl;
-                    bank->getLoans()->push_back(bank->getLoanReqs()->at(0));
 
+                    Report report;
+                    report.getLoan(bank->getAllAccounts()->at(i).getNationalCode(), bank->getLoanReqs()->at(0).getAmountOfLoan());
+
+                    
+                    bank->getLoans()->push_back(bank->getLoanReqs()->at(0));
                     bank->getLoanReqs()->erase(bank->getLoanReqs()->begin());
+
 
                     break;
                 }

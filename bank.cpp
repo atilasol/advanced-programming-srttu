@@ -235,7 +235,7 @@ void Bank::readFacilityEmployee()
 void Bank::writeNumOfComponents()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/numOfComponents.txt" , ios::out);
+    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/numOfComponents.txt", ios::out);
     fout << getCustomers()->size() << " ";
     fout << getEmployees()->size() << " ";
     fout << getAllAccounts()->size() << " ";
@@ -329,17 +329,14 @@ void Bank::writeLoanReqs()
     fstream fout;
     fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loanReqs.txt", ios::out);
 
-    if(!loanRequests->empty())
+        for (size_t i = 0; i < getLoanReqs()->size(); i++)
     {
-        for (size_t i = 0; i < loans->size(); i++)
-        {
-            fout << loanRequests->at(i).connectedAccountID << "-";
-            fout << loanRequests->at(i).dateReceived << "-";
-            fout << setprecision(1);
-            fout << fixed;
-            fout << loanRequests->at(i).amount << "-";
-            fout << loanRequests->at(i).totalNumberOfInstallments << endl;
-        }
+        fout << loanRequests->at(i).connectedAccountID << "-";
+        fout << loanRequests->at(i).dateReceived << "-";
+        fout << setprecision(1);
+        fout << fixed;
+        fout << loanRequests->at(i).amount << "-";
+        fout << loanRequests->at(i).totalNumberOfInstallments << endl;
     }
 
     fout.close();

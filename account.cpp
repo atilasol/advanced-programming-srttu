@@ -11,6 +11,7 @@ Account::Account(string aID, string nID, string date, double amount, bool isActi
 {
     if (balance >= minBalanceForLoan)
     {
+        loanReqPotential = true;
         daysMoreThanMinBalance++;
         loanAmountPotential = daysMoreThanMinBalance * balance;
     }
@@ -50,7 +51,7 @@ void Account::withdraw(double amount)
                 else
                     throw notEnoughBalanceEx();
             }
-            catch (const std::exception &e)
+            catch (const notEnoughBalanceEx &e)
             {
                 std::cerr << e.what() << '\n';
             }

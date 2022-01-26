@@ -24,7 +24,7 @@ void showFacilityEmployeeMenu();
 void showManagerMenu();
 void availableAccounts(string nationalCode);
 
-Bank *bank = new Bank("Bank Melli Hamedan", "1150036");
+Bank *bank = new Bank("Bank Melli", "1150036");
 
 int main()
 {
@@ -192,10 +192,12 @@ int employeeLogin()
     int n = -4;
     if (username == bank->getManager()->at(0).getUsername() && password == bank->getManager()->at(0).getPassword())
     {
+        cout << "$$$$$ Welcome Boss $$$$$" << endl;
         n = -2;
     }
     else if (username == bank->getFacilityEmployee()->at(0).getUsername() && password == bank->getFacilityEmployee()->at(0).getPassword())
     {
+        cout << "$$$$$ Welcome Our Facility Employee $$$$$" << endl;
         n = -1;
     }
     else
