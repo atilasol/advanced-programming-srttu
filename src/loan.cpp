@@ -24,7 +24,7 @@ int Loan::getNumberOfInstallments() { return totalNumberOfInstallments; }
 int Loan::getNumberOfPaidInstallments() { return numberOfInstallmentsPaid; }
 double Loan::getAmountOfEachInstallment() { return amountOfEachInstallment; }
 int Loan::getNumberOfWarnings() { return numberOfWarnings; }
-double Loan::getAmountOfLoan() { return amount;}
+double Loan::getAmountOfLoan() { return amount; }
 
 void Loan::setWarning() { numberOfWarnings++; }
 

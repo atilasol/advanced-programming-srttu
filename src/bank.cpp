@@ -55,7 +55,7 @@ vector<FacilityEmployee> *Bank::getFacilityEmployee() { return fEmployee; }
 void Bank::readNumOfComponents()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/numOfComponents.txt", ios::in);
+    fin.open("data/numOfComponents.txt", ios::in);
 
     int nCusomers, nEmployees, nAccounts, nLoans, nLoanReqs;
     fin >> nCusomers >> nEmployees >> nAccounts >> nLoans >> nLoanReqs;
@@ -72,7 +72,7 @@ void Bank::readNumOfComponents()
 void Bank::readCustomers()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/customers.txt", ios::in);
+    fin.open("data/customers.txt", ios::in);
 
     for (size_t i = 0; i < numOfComponents->at(0); i++)
     {
@@ -93,7 +93,7 @@ void Bank::readCustomers()
 void Bank::readEmployees()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/employees.txt", ios::in);
+    fin.open("data/employees.txt", ios::in);
 
     for (size_t i = 0; i < numOfComponents->at(1); i++)
     {
@@ -119,7 +119,7 @@ void Bank::readEmployees()
 void Bank::readAccounts()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/accounts.txt", ios::in);
+    fin.open("data/accounts.txt", ios::in);
 
     for (size_t i = 0; i < numOfComponents->at(2); i++)
     {
@@ -147,7 +147,7 @@ void Bank::readAccounts()
 void Bank::readLoan()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loans.txt", ios::in);
+    fin.open("data/loans.txt", ios::in);
 
     for (size_t i = 0; i < numOfComponents->at(3); i++)
     {
@@ -171,7 +171,7 @@ void Bank::readLoan()
 void Bank::readLoanReqs()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loanReqs.txt", ios::in);
+    fin.open("data/loanReqs.txt", ios::in);
 
     for (size_t i = 0; i < numOfComponents->at(4); i++)
     {
@@ -190,7 +190,7 @@ void Bank::readLoanReqs()
 void Bank::readManager()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/manager.txt", ios::in);
+    fin.open("data/manager.txt", ios::in);
 
     string fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH;
 
@@ -212,7 +212,7 @@ void Bank::readManager()
 void Bank::readFacilityEmployee()
 {
     fstream fin;
-    fin.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/facilityemployee.txt", ios::in);
+    fin.open("data/facilityemployee.txt", ios::in);
 
     string fName, lName, bDate, uName, pass, pNumber, bSalary, offH, overH;
 
@@ -235,7 +235,7 @@ void Bank::readFacilityEmployee()
 void Bank::writeNumOfComponents()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/numOfComponents.txt", ios::out);
+    fout.open("data/numOfComponents.txt", ios::out);
     fout << getCustomers()->size() << " ";
     fout << getEmployees()->size() << " ";
     fout << getAllAccounts()->size() << " ";
@@ -248,7 +248,7 @@ void Bank::writeNumOfComponents()
 void Bank::writeCustomers()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/customers.txt", ios::out);
+    fout.open("data/customers.txt", ios::out);
 
     for (size_t i = 0; i < customers->size(); i++)
     {
@@ -264,7 +264,7 @@ void Bank::writeCustomers()
 void Bank::writeEmployees()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/employees.txt", ios::out);
+    fout.open("data/employees.txt", ios::out);
 
     for (size_t i = 0; i < employees->size(); i++)
     {
@@ -285,7 +285,7 @@ void Bank::writeEmployees()
 void Bank::writeAccounts()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/accounts.txt", ios::out);
+    fout.open("data/accounts.txt", ios::out);
 
     for (size_t i = 0; i < allAccounts->size(); i++)
     {
@@ -305,7 +305,7 @@ void Bank::writeAccounts()
 void Bank::writeLoans()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loans.txt", ios::out);
+    fout.open("data/loans.txt", ios::out);
 
     for (size_t i = 0; i < loans->size(); i++)
     {
@@ -327,9 +327,9 @@ void Bank::writeLoans()
 void Bank::writeLoanReqs()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/loanReqs.txt", ios::out);
+    fout.open("data/loanReqs.txt", ios::out);
 
-        for (size_t i = 0; i < getLoanReqs()->size(); i++)
+    for (size_t i = 0; i < getLoanReqs()->size(); i++)
     {
         fout << loanRequests->at(i).connectedAccountID << "-";
         fout << loanRequests->at(i).dateReceived << "-";
@@ -345,7 +345,7 @@ void Bank::writeLoanReqs()
 void Bank::writeManager()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/manager.txt", ios::out);
+    fout.open("data/manager.txt", ios::out);
 
     fout << manager->at(0).firstName << "-";
     fout << manager->at(0).lastName << "-";
@@ -365,7 +365,7 @@ void Bank::writeManager()
 void Bank::writeFacilityEmployee()
 {
     fstream fout;
-    fout.open("/home/atila/Dropbox/BankingManagementSystemProject/DataBase/facilityemployee.txt", ios::out);
+    fout.open("data/facilityemployee.txt", ios::out);
 
     fout << fEmployee->at(0).firstName << "-";
     fout << fEmployee->at(0).lastName << "-";

@@ -7,7 +7,6 @@ int Date::getDay() { return day; }
 int Date::getMonth() { return month; }
 int Date::getYear() { return year; }
 
-
 int Date::compare(Date d2)
 {
     int num = 0;
@@ -89,13 +88,13 @@ bool Date::equals(Date d)
     return day == d.day && month == d.month && year == d.year;
 }
 
-ostream &operator<<(ostream &os , Date &date)
+ostream &operator<<(ostream &os, Date &date)
 {
     os << date.day << '/' << date.month << '/' << date.year;
     return os;
 }
 
-istream &operator>>(istream &is , Date &date)
+istream &operator>>(istream &is, Date &date)
 {
     cout << "Date: ";
     is >> date.day;
@@ -133,7 +132,6 @@ int days_between(Date d1, Date d2)
 
     return count;
 }
-
 
 Date str_to_date(string s)
 {

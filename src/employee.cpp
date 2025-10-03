@@ -2,9 +2,9 @@
 #include <fstream>
 #include "report.h"
 #include "bank.h"
-#include "./Exceptions/aboveOverTimeRequestEx.h"
-#include "./Exceptions/customerExistEx.h"
-#include "./Exceptions/usernameExistEx.h"
+#include "exceptions/aboveOverTimeRequestEx.h"
+#include "exceptions/customerExistEx.h"
+#include "exceptions/usernameExistEx.h"
 
 string inputFirstname();
 string inputLastname();
@@ -251,7 +251,7 @@ void Employee::createAccount(string nationalCode)
                 {
                     customerExist = true;
                     Report report;
-                    Account account(generateAccountID(),  bank->getCustomers()->at(i).getNationalCode(), report.todayDate(), balance, 1, 0, 0);
+                    Account account(generateAccountID(), bank->getCustomers()->at(i).getNationalCode(), report.todayDate(), balance, 1, 0, 0);
                     bank->getAllAccounts()->push_back(account);
                 }
             }

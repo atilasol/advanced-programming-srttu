@@ -1,8 +1,8 @@
 #include <iostream>
 #include "account.h"
 #include "report.h"
-#include "./Exceptions/accountIsNotActiveEx.h"
-#include "./Exceptions/notEnoughBalanceEx.h"
+#include "exceptions/accountIsNotActiveEx.h"
+#include "exceptions/notEnoughBalanceEx.h"
 
 using namespace std;
 

@@ -271,7 +271,7 @@ void selectAndDoOperationForEmployee(int eIndex)
             cout << "Enter the national code: ";
             string nCode;
             cin >> nCode;
-            if(nCode.length() == 10)
+            if (nCode.length() == 10)
             {
                 bank->getEmployees()->at(eIndex).createAccount(nCode);
             }
@@ -384,7 +384,7 @@ void doOperationForFacilityEmployee()
     {
         showEmployeeMenu();
         showFacilityEmployeeMenu();
-       cout << "11-Exit" << endl;
+        cout << "11-Exit" << endl;
         int choice = selectChoice();
 
         if (choice == 1)

@@ -4,7 +4,7 @@
 #include "customer.h"
 #include "bank.h"
 #include "report.h"
-#include "./Exceptions/cannotSendLoanReqEx.h"
+#include "exceptions/cannotSendLoanReqEx.h"
 
 string generateSerialNumber(Bank *bank);
 int chooseNumberOfInstallments();

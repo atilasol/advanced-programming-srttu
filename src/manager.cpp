@@ -1,6 +1,6 @@
 #include "manager.h"
-#include "./Exceptions/employeeExistEx.h"
-#include "./Exceptions/usernameExistEx.h"
+#include "exceptions/employeeExistEx.h"
+#include "exceptions/usernameExistEx.h"
 
 string inputFirstname();
 string inputLastname();
@@ -58,7 +58,7 @@ void Manager::hireEmployee()
                 }
             }
         }
-        catch(const employeeExistEx &e)
+        catch (const employeeExistEx &e)
         {
             std::cerr << e.what() << '\n';
         }
@@ -67,7 +67,6 @@ void Manager::hireEmployee()
         {
             break;
         }
-        
     }
 
     birthDate = inputBirthdate();
@@ -87,22 +86,21 @@ void Manager::hireEmployee()
                 }
             }
         }
-        catch(const usernameExistEx &e)
+        catch (const usernameExistEx &e)
         {
             std::cerr << e.what() << '\n';
         }
-        
-        if(usernameExist == false)
+
+        if (usernameExist == false)
         {
             break;
         }
-        
     }
     password = inputPassword();
     // implemtn personal number
     basicSalary = inputBasicSalary();
 
-    Employee employee(firstName , lastName , birthDate , username , password , basicSalary , 0 , 0 , this->bank);
+    Employee employee(firstName, lastName, birthDate, username, password, basicSalary, 0, 0, this->bank);
     bank->employees->push_back(employee);
 }
 

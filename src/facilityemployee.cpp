@@ -1,6 +1,6 @@
 #include "facilityemployee.h"
 #include "report.h"
-#include "/home/atila/Dropbox/BankingManagementSystemProject/Exceptions/accountIsNotActiveEx.h"
+#include "exceptions/accountIsNotActiveEx.h"
 
 FacilityEmployee::FacilityEmployee(string fName, string lName, string bDate, string uName, string pass, int pNum, double bSalary, double offH, double overH, Bank *b)
     : Employee(fName, lName, bDate, uName, pass, pNum, bSalary, offH, overH, b)
@@ -70,10 +70,8 @@ void FacilityEmployee::checkLoanReq()
                     Report report;
                     report.getLoan(bank->getAllAccounts()->at(i).getNationalCode(), bank->getLoanReqs()->at(0).getAmountOfLoan());
 
-                    
                     bank->getLoans()->push_back(bank->getLoanReqs()->at(0));
                     bank->getLoanReqs()->erase(bank->getLoanReqs()->begin());
-
 
                     break;
                 }
